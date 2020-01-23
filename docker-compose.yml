@@ -5,7 +5,7 @@ services:
         # command: redis-server --requirepass redispass
 
     postgres:
-        image: postgres:9.6
+        image: postgres:11.5
         environment:
             - POSTGRES_USER=airflow
             - POSTGRES_PASSWORD=airflow
@@ -16,7 +16,7 @@ services:
         #     - ./pgdata:/var/lib/postgresql/data/pgdata
 
     webserver:
-        image: puckel/docker-airflow:1.10.7
+        image: eclipser/docker-airflow:latest
         restart: always
         depends_on:
             - postgres
@@ -31,6 +31,9 @@ services:
             # - REDIS_PASSWORD=redispass
         volumes:
             - ./dags:/usr/local/airflow/dags
+            #- ./variable:/usr/local/variable
+            - ./results:/usr/local/results
+            - ./data:/usr/local/data
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         ports:
@@ -43,7 +46,7 @@ services:
             retries: 3
 
     flower:
-        image: puckel/docker-airflow:1.10.7
+        image: eclipser/docker-airflow:latest
         restart: always
         depends_on:
             - redis
@@ -55,12 +58,15 @@ services:
         command: flower
 
     scheduler:
-        image: puckel/docker-airflow:1.10.7
+        image: eclipser/docker-airflow:latest
         restart: always
         depends_on:
             - webserver
         volumes:
             - ./dags:/usr/local/airflow/dags
+            #- ./variable:/usr/local/airflow/variable
+            - ./results:/usr/local/results
+            - ./data:/usr/local/data
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         environment:
@@ -74,12 +80,15 @@ services:
         command: scheduler
 
     worker:
-        image: puckel/docker-airflow:1.10.7
+        image: eclipser/docker-airflow:latest
         restart: always
         depends_on:
             - scheduler
         volumes:
             - ./dags:/usr/local/airflow/dags
+            #- ./variable:/usr/local/airflow/variable
+            - ./results:/usr/local/results
+            - ./data:/usr/local/data
             # Uncomment to include custom plugins
             # - ./plugins:/usr/local/airflow/plugins
         environment:
